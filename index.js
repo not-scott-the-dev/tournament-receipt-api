@@ -1,6 +1,6 @@
 import express from 'express';
 import React from 'react';
-import ReactDOMServer from 'react-dom/server.js';
+import ReactDOMServer from 'react-dom/index.js';
 import puppeteer from 'puppeteer';
 import path from 'path';
 import fs from 'fs';
