@@ -4,7 +4,7 @@ import ReactDOMServer from 'react-dom/server';
 import puppeteer from 'puppeteer';
 import fs from 'fs';
 import path from 'path';
-import axios from 'axios';
+
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { createRequire } from 'module';
