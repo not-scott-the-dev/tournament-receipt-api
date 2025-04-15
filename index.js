@@ -1,12 +1,26 @@
-const express = require('express');
-const React = require('react');
-const ReactDOMServer = require('react-dom/server');
-const puppeteer = require('puppeteer');
-const path = require('path');
-const fs = require('fs');
-require('@babel/register')({ extensions: ['.js', '.jsx'] });
+import express from 'express';
+import React from 'react';
+import ReactDOMServer from 'react-dom/server.js';
+import puppeteer from 'puppeteer';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-const SwadeshiReceipt = require('./SwadeshiReceipt').default;
+// Simulate __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Register Babel for JSX
+import('@babel/register').then(() => {
+  require.extensions['.jsx'] = require.extensions['.js'];
+});
+
+// Dynamic import of SwadeshiReceipt after Babel register
+const loadReceiptComponent = async () => {
+  const module = await import('./SwadeshiReceipt.jsx');
+  return module.default;
+};
 
 const app = express();
 app.use(express.json());
