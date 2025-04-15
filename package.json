@@ -4,7 +4,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "build": "babel src -d build",
+    "build": "babel SwadeshiReceipt.jsx -d build",
     "start": "node build/index.js"
   },
   "dependencies": {
