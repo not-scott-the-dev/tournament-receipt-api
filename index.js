@@ -1,24 +1,24 @@
-import express from "express";
-import React from "react";
-import ReactDOMServer from "react-dom/server";
-import puppeteer from "puppeteer";
-import path from "path";
-import fs from "fs";
-import { fileURLToPath } from "url";
-import SwadeshiReceipt from "./SwadeshiReceipt.jsx";
+const express = require('express');
+const React = require('react');
+const ReactDOMServer = require('react-dom/server');
+const puppeteer = require('puppeteer');
+const path = require('path');
+const fs = require('fs');
+require('@babel/register')({ extensions: ['.js', '.jsx'] });
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const SwadeshiReceipt = require('./SwadeshiReceipt').default;
 
 const app = express();
 app.use(express.json());
-app.use("/receipts", express.static(path.join(__dirname, "receipts")));
 
-app.post("/generate-receipt", async (req, res) => {
+// Serve static images from /receipts
+app.use('/receipts', express.static(path.join(__dirname, 'receipts')));
+
+app.post('/generate-receipt', async (req, res) => {
   const { name, team, players, contact, amount, receiptId, matchDate, matchTime } = req.body;
 
   const element = React.createElement(SwadeshiReceipt, {
-    name, team, players, contact, amount, receiptId, matchDate, matchTime
+    name, team, players, contact, amount, receiptId, matchDate, matchTime,
   });
 
   const html = ReactDOMServer.renderToStaticMarkup(element);
@@ -29,17 +29,19 @@ app.post("/generate-receipt", async (req, res) => {
     </html>
   `;
 
-  const browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox"] });
+  // Generate screenshot
+  const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
   const page = await browser.newPage();
-  await page.setContent(fullHtml, { waitUntil: "networkidle0" });
+  await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
 
   const fileName = `${receiptId}.png`;
-  const filePath = path.join(__dirname, "receipts", fileName);
-  await page.screenshot({ path: filePath, fullPage: true, type: "png" });
+  const filePath = path.join(__dirname, 'receipts', fileName);
+  await page.screenshot({ path: filePath, fullPage: true, type: 'png' });
   await browser.close();
 
-  const imageUrl = `${req.protocol}://${req.get("host")}/receipts/${fileName}`;
+  // Send URL of image
+  const imageUrl = `${req.protocol}://${req.get('host')}/receipts/${fileName}`;
   res.json({ imageUrl });
 });
 
-app.listen(3000, () => console.log("Swadeshi Receipt API running on port 3000"));
+app.listen(3000, () => console.log('Swadeshi Receipt API running on port 3000'));
